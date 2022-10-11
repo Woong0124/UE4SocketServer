@@ -1,7 +1,9 @@
 #pragma comment (lib, "libmysql.lib")
+#pragma comment (lib, "ws2_32.lib")
 
 #include <mysql.h>
 #include <iostream>
+
 
 
 int main()
@@ -35,6 +37,67 @@ int main()
 		std::cout << "Connect Success\n" << std::endl;
 	}
 
+
+
+
+
+	// Load Winsock
+	WSAData wsaData;
+	if (WSAStartup(MAKEWORD(2, 2), &wsaData))
+	{
+		std::cout << "Winsock Error : " << GetLastError() << std::endl;
+		exit(-1);
+	}
+
+	// Create socket
+	SOCKET ServerSocket = socket(AF_INET, SOCK_STREAM, 0);
+	if (ServerSocket == INVALID_SOCKET)
+	{
+		std::cout << "fail create Socket : " << GetLastError() << std::endl;
+		exit(-1);
+	}
+
+	// Socket element
+	SOCKADDR_IN ServerSockAddr;
+	memset(&ServerSockAddr, 0, sizeof(SOCKADDR_IN));
+	ServerSockAddr.sin_family = PF_INET;
+	ServerSockAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	ServerSockAddr.sin_port = htons(3307);
+
+	// Bind socket
+	int BindServerSock = bind(ServerSocket, (SOCKADDR*)&ServerSockAddr, sizeof(SOCKADDR_IN));
+	if (BindServerSock == SOCKET_ERROR)
+	{
+		std::cout << "fail bind : " << GetLastError() << std::endl;
+		exit(-1);
+	}
+
+	// Listening
+	BindServerSock = listen(ServerSocket, 0);
+	if (BindServerSock == SOCKET_ERROR)
+	{
+		std::cout << "fail listen : " << GetLastError() << std::endl;
+		exit(-1);
+	}
+
+	// Create client socket
+	// Client request connect >> Accept role
+	SOCKADDR_IN ClientSockAddr;
+	memset(&ClientSockAddr, 0, sizeof(SOCKADDR_IN));
+	int ClientSockAddrLength = sizeof(ClientSockAddr);
+
+	// Accept client
+	SOCKET ClientSocket = accept(ServerSocket, (SOCKADDR*)&ClientSockAddr, &ClientSockAddrLength);
+	if (ClientSocket == SOCKET_ERROR)
+	{
+		std::cout << "fail accept : " << GetLastError() << std::endl;
+		exit(-1);
+	}
+
+
+
+
+
 	// Query request
 	SqlStat = mysql_query(MySql, "SELECT * FROM DATATABLE");
 
@@ -56,6 +119,15 @@ int main()
 
 	// Clear result
 	mysql_free_result(SqlResult);
+
+
+
+
+
+	// Close sockets
+	closesocket(ServerSocket);
+	closesocket(ClientSocket);
+	WSACleanup();
 
 	// Disconnect database
 	mysql_close(MySql);
