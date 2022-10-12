@@ -114,7 +114,11 @@ int main()
 	// Result output
 	while ((SqlRow = mysql_fetch_row(SqlResult)) != NULL)
 	{
-		std::cout << SqlRow[0] << ", " << SqlRow[1] << ", " << SqlRow[2] << ", " << SqlRow[3] << ", " << SqlRow[4] << std::endl;
+		for (int i = 0; i < mysql_num_fields(SqlResult); ++i)
+		{
+			std::cout << SqlRow[i] << "  ";
+		}
+		std::cout << std::endl;
 	}
 
 	// Clear result
