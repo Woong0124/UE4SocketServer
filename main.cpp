@@ -8,25 +8,25 @@
 
 int main()
 {
-	// MYSQL Create
+	// MYSQL 생성
 	MYSQL* MySql = NULL, mysql;
 
-	// Structure containing the result when the query is successful
+	// 쿼리문 성공 시, 결과 담는 구조체
 	MYSQL_RES* SqlResult;
 
-	// When the query succeeds, row information of the result structure
+	// 결과의 행 정보
 	MYSQL_ROW SqlRow;
 
-	// Check query is successful
+	// 쿼리문 성공 여부
 	bool SqlStat;
 
-	// MYSQL initialization
+	// MYSQL 초기화
 	mysql_init(&mysql);
 
-	// Connect database
+	// Database 연결
 	MySql = mysql_real_connect(&mysql, "localhost", "root", "0000", "UE4SocketDB", 3306, NULL, 0);
 
-	// success or failure messege
+	// 성공 or 실패 처리
 	if (!MySql)
 	{
 		std::cout << "Connect Failed : Error" << std::endl;
@@ -41,7 +41,7 @@ int main()
 
 
 
-	// Load Winsock
+	// Winsock 로드
 	WSAData wsaData;
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData))
 	{
@@ -49,7 +49,7 @@ int main()
 		exit(-1);
 	}
 
-	// Create socket
+	// Socket 생성
 	SOCKET ServerSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (ServerSocket == INVALID_SOCKET)
 	{
@@ -57,14 +57,14 @@ int main()
 		exit(-1);
 	}
 
-	// Socket element
+	// Socket 구성 요소
 	SOCKADDR_IN ServerSockAddr;
 	memset(&ServerSockAddr, 0, sizeof(SOCKADDR_IN));
 	ServerSockAddr.sin_family = PF_INET;
 	ServerSockAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	ServerSockAddr.sin_port = htons(3307);
 
-	// Bind socket
+	// Socket 바인드
 	int BindServerSock = bind(ServerSocket, (SOCKADDR*)&ServerSockAddr, sizeof(SOCKADDR_IN));
 	if (BindServerSock == SOCKET_ERROR)
 	{
@@ -72,7 +72,7 @@ int main()
 		exit(-1);
 	}
 
-	// Listening
+	// Socket 수신대기
 	BindServerSock = listen(ServerSocket, 0);
 	if (BindServerSock == SOCKET_ERROR)
 	{
@@ -80,13 +80,13 @@ int main()
 		exit(-1);
 	}
 
-	// Create client socket
-	// Client request connect >> Accept role
+	// Client socket 생성
+	// 클라이언트 접속 요청 시, 승인해 주는 역할
 	SOCKADDR_IN ClientSockAddr;
 	memset(&ClientSockAddr, 0, sizeof(SOCKADDR_IN));
 	int ClientSockAddrLength = sizeof(ClientSockAddr);
 
-	// Accept client
+	// Client 접속 승인
 	SOCKET ClientSocket = accept(ServerSocket, (SOCKADDR*)&ClientSockAddr, &ClientSockAddrLength);
 	if (ClientSocket == SOCKET_ERROR)
 	{
@@ -98,20 +98,20 @@ int main()
 
 
 
-	// Query request
+	// Query 요청
 	SqlStat = mysql_query(MySql, "SELECT * FROM DATATABLE");
 
-	// On query failure messege
+	// Query 실패 시
 	if (SqlStat)
 	{
 		fprintf(stderr, "Query Error : %s", mysql_error(&mysql));
 		return 1;
 	}
 
-	// Save result
+	// Query 요청 결과 저장
 	SqlResult = mysql_store_result(MySql);
 
-	// Result output
+	// Query 결과 출력
 	while ((SqlRow = mysql_fetch_row(SqlResult)) != NULL)
 	{
 		for (int i = 0; i < mysql_num_fields(SqlResult); ++i)
@@ -121,19 +121,19 @@ int main()
 		std::cout << std::endl;
 	}
 
-	// Clear result
+	// Query 결과 초기화
 	mysql_free_result(SqlResult);
 
 
 
 
 
-	// Close sockets
+	// Socket 해제
 	closesocket(ServerSocket);
 	closesocket(ClientSocket);
 	WSACleanup();
 
-	// Disconnect database
+	// Database 해제
 	mysql_close(MySql);
 	return 0;
 }
