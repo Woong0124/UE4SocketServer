@@ -150,6 +150,7 @@
     <ClCompile Include="Source\Private\test.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Public\DataStruct.h" />
     <ClInclude Include="Source\Public\MyDB.h" />
     <ClInclude Include="Source\Public\MySocket.h" />
   </ItemGroup>

@@ -44,5 +44,8 @@
     <ClInclude Include="Source\Public\MySocket.h">
       <Filter>Source\Public</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Public\DataStruct.h">
+      <Filter>Source\Public</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
