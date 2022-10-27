@@ -32,14 +32,14 @@ int main()
 
 	// 소켓 오류 체크
 	bool SocketCheck;
-	
+
 	// Socket
 	SocketCheck = MySock->CreateSocket();
 	if (SocketCheck == false)
 	{
 		exit(-1);
 	}
-	
+
 	// Bind, Listen
 	SocketCheck = MySock->BindListenSocket();
 	if (SocketCheck == false)
@@ -58,14 +58,29 @@ int main()
 
 
 
-	// 쿼리 전달
-	MyDataBase->QueryTransmission("SELECT * FROM DATATABLE");
+	DataStruct* DStruct = new DataStruct;
 
+	while (true)
+	{
+		MyDataBase->QueryTransmission("SELECT * FROM DATATABLE");
 
-	// 테스트 중
-	DataStruct* a = new DataStruct;
-	MyDataBase->QueryStructInsert(a);
-	MySock->SendStructSocket(a);
+		DStruct->AInfo = SpawnActor;
+		while ((MyDataBase->SqlRow = mysql_fetch_row(MyDataBase->SqlResult)) != NULL)
+		{
+			MyDataBase->QueryStructInsert(DStruct);
+			MySock->SendStructSocket(DStruct);
+		}
+
+		DStruct->Key = 9;
+		DStruct->AInfo = MoveActor;
+		DStruct->LocX = 1;
+		DStruct->LocY = 0;
+		DStruct->LocZ = 0;
+
+		MySock->SendStructSocket(DStruct);
+	}
+
+	delete DStruct;
 
 
 
